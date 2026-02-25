@@ -1,0 +1,32 @@
+# Data (downloaded separately)
+data/motions/*
+!data/motions/.gitkeep
+
+# Results
+results/
+*.json
+!config.yaml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+*.egg
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# CARLA
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

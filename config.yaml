@@ -1,0 +1,24 @@
+# HABIT Benchmark Configuration
+carla:
+  host: "localhost"
+  port: 2000
+  traffic_manager_port: 8030
+  timeout: 300.0
+  frame_rate: 20  # Hz
+
+data:
+  motions_dir: "data/motions"              # CARLA-ready motion files (download separately)
+  spawn_points: "data/spawn_points/Town10__spawn_points.pkl"
+  routes: "data/routes/town10_routes.xml"
+  csvs_dir: "data/csvs"                   # Crossing/Attempting/Not_Crossing CSVs
+
+evaluation:
+  track: "SENSORS"
+  repetitions: 1
+  checkpoint: "results/results.json"
+  resume: false
+
+pedestrians:
+  count: 100
+  min_distance: 4.0
+  proximity_threshold: 30.0  # meters from ego to activate detailed motion
