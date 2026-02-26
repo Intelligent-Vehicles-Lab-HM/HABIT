@@ -143,3 +143,9 @@ These are downsampled versions of the full route. Use them for high-level naviga
 - Use the `DummyAgent` at `leaderboard/autoagents/dummy_agent.py` as a reference for the expected interface.
 - Sensor data arrives as numpy arrays for cameras and LIDAR. Check `input_data[sensor_id][1]` for the data and `input_data[sensor_id][0]` for the frame number.
 - The evaluator will reject your agent if it uses sensors not allowed by the chosen track.
+
+## Environment Considerations
+
+If your agent requires specific deep learning frameworks (e.g., PyTorch), you may need a separate conda environment. The HABIT paper evaluates InterFuser, TransFuser, and BEVDriver, each requiring different PyTorch versions.
+
+See [agent_environments.md](agent_environments.md) for details on setting up agent-specific environments.

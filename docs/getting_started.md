@@ -5,23 +5,45 @@ This guide walks through setting up the HABIT benchmark from scratch, running yo
 ## Prerequisites
 
 - **Operating System:** Ubuntu 18.04 or later
-- **Python:** 3.7 or later
+- **Python:** 3.8
 - **GPU:** NVIDIA GPU with compatible drivers (required for CARLA rendering)
-- **Docker:** Installed and configured with NVIDIA Container Toolkit (`nvidia-docker`)
-- **Disk Space:** approximately 10 GB (CARLA docker image, motion data, and dependencies)
+- **CARLA 0.9.14:** Docker or native installation (see below)
+- **Disk Space:** approximately 10 GB (CARLA, motion data, and dependencies)
 
-## 1. CARLA 0.9.14 Docker Setup
+## 0. Create the Conda Environment
+
+```bash
+conda env create -f environment.yml
+conda activate habit
+```
+
+This creates a `habit` environment with Python 3.8 and installs all pip dependencies from `requirements.txt`.
+
+> **Note:** If you prefer not to use conda, you can install dependencies directly with `pip install -r requirements.txt` in a Python 3.8 virtualenv.
+
+## 1. CARLA 0.9.14 Setup
+
+### Option A: Docker (recommended)
 
 Pull and start the CARLA 0.9.14 simulator in a Docker container:
 
 ```bash
 docker pull carlasim/carla:0.9.14
-docker run --privileged --gpus all --net=host -e DISPLAY=$DISPLAY carlasim/carla:0.9.14 /bin/bash ./CarlaUE4.sh -RenderOffScreen
+docker run --privileged --gpus all --net=host -e DISPLAY=$DISPLAY \
+  carlasim/carla:0.9.14 /bin/bash ./CarlaUE4.sh -RenderOffScreen
 ```
 
 This launches CARLA in offscreen rendering mode, listening on the default port 2000. Keep this terminal running while you execute the benchmark in a separate terminal.
 
-To verify CARLA is running, you can test the connection from Python:
+### Option B: Native installation
+
+If you have a local CARLA 0.9.14 build:
+
+```bash
+DISPLAY= ./CarlaUE4.sh -RenderOffScreen -carla-rpc-port=2000
+```
+
+To verify CARLA is running, test the connection from Python:
 
 ```python
 import carla
@@ -35,38 +57,45 @@ print(client.get_server_version())
 ```bash
 git clone <repository-url> habit
 cd habit
+conda activate habit
 pip install -r requirements.txt
-```
-
-You also need the CARLA Python API package, which must match the server version:
-
-```bash
-pip install carla==0.9.14
 ```
 
 ## 3. Set the PYTHONPATH
 
-The benchmark depends on both the CARLA PythonAPI and the local `scenario_runner` package. Set the required paths before running any evaluation:
+The benchmark depends on both the CARLA PythonAPI and the local `scenario_runner` package. The CARLA PythonAPI is **not** pip-installable — it ships as an `.egg` file inside the CARLA installation directory.
+
+**With a local CARLA installation or Docker volume mount:**
 
 ```bash
 export CARLA_ROOT=/path/to/carla
-export PYTHONPATH=$CARLA_ROOT/PythonAPI/carla:$(pwd):$(pwd)/scenario_runner:$PYTHONPATH
+export SCENARIO_RUNNER_ROOT=$(pwd)/scenario_runner
+export LEADERBOARD_ROOT=$(pwd)
+export PYTHONPATH="${CARLA_ROOT}/PythonAPI/carla/:${SCENARIO_RUNNER_ROOT}:${LEADERBOARD_ROOT}:${PYTHONPATH}"
 ```
 
-If you are using the Docker-based CARLA setup without a local CARLA installation, you only need the local paths:
+**With Docker-only CARLA (no local install):**
+
+You need to extract the CARLA PythonAPI egg from the Docker image:
 
 ```bash
-export PYTHONPATH=$(pwd):$(pwd)/scenario_runner:$PYTHONPATH
+# Copy the egg from the container
+docker cp <container_id>:/home/carla/PythonAPI/carla/dist/carla-0.9.14-py3.7-linux-x86_64.egg .
+
+# Add it to PYTHONPATH
+export PYTHONPATH=$(pwd)/carla-0.9.14-py3.7-linux-x86_64.egg:$(pwd):$(pwd)/scenario_runner:$PYTHONPATH
 ```
 
 ## 4. Download Motion Data
 
-Download the CARLA-ready motion files from the project's data release (link TBD) and place them in the `data/motions/` directory:
+> **Coming soon** — The motion data release is being finalized. The benchmark includes 4,730 curated .pkl files derived from HumanML3D/AMASS motion-capture data. Star & watch this repository for the release announcement.
+
+Once available, download the motion files and place them in the `data/motions/` directory:
 
 ```
 habit/
   data/
-    motions/          <-- place motion .npy files here
+    motions/          <-- place motion .pkl files here
     routes/
       town10_routes.xml
     csvs/
@@ -79,46 +108,65 @@ habit/
 
 The `data/routes/`, `data/csvs/`, and `data/spawn_points/` directories are included in the repository.
 
-## 5. Run an Evaluation with the Dummy Agent
+> **Without motion data**, the `PedBackgroundBehavior` component will not function (it requires motion files to animate pedestrians). You can still explore the codebase, study the evaluation framework, prepare your agent against the `AutonomousAgent` interface, and run the evaluator with pedestrian spawning disabled.
 
-The simplest way to verify your setup is to run the included dummy agent, which outputs zero controls (the vehicle remains stationary):
+## 5. Run an Evaluation
+
+### Dummy agent (vehicle stays stationary)
+
+The simplest way to verify your setup is to run the included dummy agent:
 
 ```bash
 bash scripts/run_evaluation.sh leaderboard/autoagents/dummy_agent.py
+```
+
+### NPC agent (drives at 30 km/h using BasicAgent)
+
+```bash
+bash scripts/run_evaluation.sh leaderboard/autoagents/npc_agent.py
+```
+
+### With a custom config
+
+You can pass a YAML configuration file that controls motion data paths, pedestrian parameters, and other settings:
+
+```bash
+CONFIG=path/to/config.yaml bash scripts/run_evaluation.sh leaderboard/autoagents/npc_agent.py
+```
+
+Or call the evaluator directly:
+
+```bash
+python3 leaderboard/leaderboard_evaluator.py \
+    --routes=data/routes/town10_routes.xml \
+    --repetitions=1 \
+    --track=SENSORS \
+    --agent=leaderboard/autoagents/npc_agent.py \
+    --checkpoint=results/results.json \
+    --config=path/to/config.yaml \
+    --debug=0
 ```
 
 This will:
 1. Connect to the running CARLA server
 2. Load Town10HD routes
 3. Spawn pedestrians with motion-captured animations
-4. Run the dummy agent through each route
-5. Write results to `results/results.json`
+4. Run the agent through each route
+5. Write results to the checkpoint file
 
-## 6. Run with InterFuser or BEVDriver
+## 6. Run with InterFuser, TransFuser, or BEVDriver
 
-The paper results use [InterFuser](https://github.com/opendilab/InterFuser) and BEVDriver as the evaluated AD agents. To reproduce these results:
+The paper evaluates three state-of-the-art AD agents:
 
-**InterFuser:**
+| Agent | Repository | Key Dependency |
+|-------|-----------|---------------|
+| [InterFuser](https://github.com/opendilab/InterFuser) | opendilab/InterFuser | PyTorch 1.12 |
+| [TransFuser](https://github.com/autonomousvision/transfuser) | autonomousvision/transfuser | PyTorch 1.12 |
+| [BEVDriver](https://github.com/AlanLiangC/BEVDriver) | AlanLiangC/BEVDriver | PyTorch 2.0 |
 
-1. Clone and install InterFuser following its repository instructions.
-2. Download the InterFuser pretrained weights.
-3. Run the evaluation, pointing to the InterFuser agent file and config:
+Each agent requires its own conda environment due to conflicting PyTorch versions. See [agent_environments.md](agent_environments.md) for detailed setup instructions.
 
-```bash
-bash scripts/run_evaluation.sh /path/to/interfuser/agent.py --agent-config /path/to/interfuser/config.yaml
-```
-
-**BEVDriver:**
-
-1. Clone and install BEVDriver following its repository instructions.
-2. Download the BEVDriver pretrained weights.
-3. Run similarly:
-
-```bash
-bash scripts/run_evaluation.sh /path/to/bevdriver/agent.py --agent-config /path/to/bevdriver/config.yaml
-```
-
-Both agents must implement the `AutonomousAgent` interface described in [custom_agents.md](custom_agents.md).
+> **Coming soon** — Full integration guides for all three agents are being prepared. The agent interface is documented in [custom_agents.md](custom_agents.md).
 
 ## 7. Understanding Results
 

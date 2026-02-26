@@ -7,6 +7,9 @@ results/
 *.json
 !config.yaml
 
+# Test artifacts
+test_run/
+
 # Python
 __pycache__/
 *.pyc

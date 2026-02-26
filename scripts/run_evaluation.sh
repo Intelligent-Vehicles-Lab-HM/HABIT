@@ -15,6 +15,7 @@ CHECKPOINT="${CHECKPOINT:-$PROJECT_ROOT/results/results.json}"
 REPETITIONS="${REPETITIONS:-1}"
 TRACK="${TRACK:-SENSORS}"
 RESUME="${RESUME:-False}"
+CONFIG="${CONFIG:-}"
 
 mkdir -p "$(dirname "$CHECKPOINT")"
 
@@ -27,4 +28,5 @@ python3 ${LEADERBOARD_ROOT}/leaderboard/leaderboard_evaluator.py \
     --checkpoint=${CHECKPOINT} \
     --debug=0 \
     --record="${RECORD_PATH:-}" \
-    --resume=${RESUME}
+    --resume=${RESUME} \
+    ${CONFIG:+--config=${CONFIG}}
