@@ -42,7 +42,8 @@ sensors_to_icons = {
     'sensor.other.gnss':        'carla_gnss',
     'sensor.other.imu':         'carla_imu',
     'sensor.opendrive_map':     'carla_opendrive_map',
-    'sensor.speedometer':       'carla_speedometer'
+    'sensor.speedometer':       'carla_speedometer',
+    'sensor.camera.semantic_segmentation': 'carla_semantic'
 }
 
 class LeaderboardEvaluator(object):
@@ -296,6 +297,7 @@ class LeaderboardEvaluator(object):
             self.agent_instance = agent_class_obj(args.host, args.port, args.debug)
             self.agent_instance.set_global_plan(self.route_scenario.gps_route, self.route_scenario.route)
             self.agent_instance.setup(args.agent_config)
+            self.agent_instance.set_animations(self.route_scenario)
 
             # Check and store the sensors
             if not self.sensors:

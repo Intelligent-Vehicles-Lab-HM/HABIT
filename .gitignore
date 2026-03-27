@@ -30,6 +30,10 @@ build/
 # CARLA
 *.log
 
+# Large files
+*.pdf
+*.zip
+
 # OS
 .DS_Store
 Thumbs.db

@@ -54,6 +54,13 @@ class AutonomousAgent(object):
         """
         pass
 
+    def set_animations(self, route_scenario):
+        """
+        Receive the route scenario for accessing pedestrian behavior data.
+        Override in agent subclasses that need ground truth pedestrian animations.
+        """
+        pass
+
     def sensors(self):  # pylint: disable=no-self-use
         """
         Define the sensor suite required by the agent

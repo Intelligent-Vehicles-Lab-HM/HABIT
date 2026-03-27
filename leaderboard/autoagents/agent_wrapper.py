@@ -34,6 +34,7 @@ QUALIFIER_SENSORS_LIMITS = {
 }
 SENSORS_LIMITS = {
     'sensor.camera.rgb': 8,
+    'sensor.camera.semantic_segmentation': 8,
     'sensor.lidar.ray_cast': 2,
     'sensor.other.radar': 4,
     'sensor.other.gnss': 1,
@@ -154,7 +155,7 @@ class AgentWrapper(object):
             sensor_location = carla.Location()
             sensor_rotation = carla.Rotation()
 
-        if type_ == 'sensor.camera.rgb':
+        if type_ in ('sensor.camera.rgb', 'sensor.camera.semantic_segmentation'):
             attributes['image_size_x'] = str(sensor_spec['width'])
             attributes['image_size_y'] = str(sensor_spec['height'])
             attributes['fov'] = str(sensor_spec['fov'])

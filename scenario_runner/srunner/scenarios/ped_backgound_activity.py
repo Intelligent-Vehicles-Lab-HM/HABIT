@@ -43,48 +43,10 @@ class PedBackgroundBehavior(AtomicBehavior):
         self._animation_interval = 0.05
         self._last_tick_time = None
         self.num_idle_real_peds = 20  # default: 25 before
-        self.num_idle_only_peds = 20  # default: 25
+        self.num_idle_only_peds = 10
 
-
-    # def initialise(self):
-    #     self._last_tick_time = GameTime.get_time()
-    #     spawn_points = self._load_spawn_points()
-    #     nearby_spawns = self._filter_spawns_near_route(spawn_points, max_distance=30.0)
-    #     animations = self._load_animation_files()
-
-    #     all_blueprints = self.world.get_blueprint_library().filter('walker.pedestrian.*')
-    #     blueprints = [bp for bp in all_blueprints if bp.id not in EXCLUDED_BLUEPRINTS]
-
-    #     idx = 0
-    #     for spawn_point in random.sample(nearby_spawns, min(len(nearby_spawns), 25)):
-    #         walker_bp = random.choice(blueprints)
-    #         walker = self.world.try_spawn_actor(walker_bp, spawn_point)
-    #         if not walker:
-    #             continue
-
-    #         motion_path = random.choice(animations['motions'])
-    #         idle_path = random.choice(animations['idles'])
-    #         pose_data, transl = self._load_animation(motion_path)
-    #         idle_pose_data, idle_transl = self._load_animation(idle_path)
-
-    #         self._pedestrians.append(walker)
-    #         self._animations.append(type('Anim', (object,), {
-    #             'walker': walker,
-    #             'pose_data': pose_data,
-    #             'transl': transl,
-    #             'idle_pose_data': idle_pose_data,
-    #             'idle_transl': idle_transl,
-    #             'required_joints': REQUIRED_JOINTS,
-    #             'initial_facing': spawn_point.rotation.yaw,
-    #             'fixed_spawn_point': spawn_point,
-    #             'offset': carla.Location(),
-    #             'last_world_loc': spawn_point.location,
-    #             'motion_cycle': 0
-    #         })())
-    #         self._frame_counters[idx] = 0
-    #         self._state[idx] = "idle"
-    #         idx += 1
     def initialise(self):
+        random.seed(2000)
         self._last_tick_time = GameTime.get_time()
         spawn_points = self._load_spawn_points()
         nearby_spawns = self._filter_spawns_near_route(spawn_points, max_distance=30.0)
@@ -127,7 +89,7 @@ class PedBackgroundBehavior(AtomicBehavior):
             idx += 1
 
         # --- Add ambient idle-only pedestrians ---
-        extra_idle_spawns = [sp for sp in spawn_points if sp not in used_spawn_points]
+        extra_idle_spawns = [sp for sp in nearby_spawns if sp not in used_spawn_points]
         random.shuffle(extra_idle_spawns)
         extra_idle_spawns = extra_idle_spawns[:self.num_idle_only_peds]
 
@@ -182,24 +144,10 @@ class PedBackgroundBehavior(AtomicBehavior):
             pedestrian = anim.walker
             distance = pedestrian.get_transform().location.distance(self.ego.get_transform().location)
 
-            # if self._state.get(idx, "idle") == "idle" and distance < 30:
-            #     self._state[idx] = "real"
-            #     frame_index = self._frame_counters.get(idx, 0)
-            #     theta_rad = math.radians(anim.initial_facing - 90)
-            #     base_location = carla.Location(
-            #         x=float(anim.transl[0][0]) * math.cos(theta_rad) - float(anim.transl[0][2]) * math.sin(theta_rad),
-            #         y=float(anim.transl[0][0]) * math.sin(theta_rad) + float(anim.transl[0][2]) * math.cos(theta_rad),
-            #         z=0
-            #     ) + anim.fixed_spawn_point.location + anim.offset
-            #     current_location = pedestrian.get_transform().location
-            #     anim.offset = current_location - base_location
-            #     anim.last_world_loc = current_location
-            #     self._frame_counters[idx] = 0
-            #     anim.motion_cycle += 1
             if self._state.get(idx) == "idle-only":
                 # Ambient idle peds never switch to real
                 pass
-            elif self._state.get(idx) == "idle" and distance < 30:
+            elif self._state.get(idx) == "idle" and distance < 15:
                 self._state[idx] = "real"
                 frame_index = self._frame_counters.get(idx, 0)
                 theta_rad = math.radians(anim.initial_facing - 90)
@@ -216,8 +164,6 @@ class PedBackgroundBehavior(AtomicBehavior):
 
             frame_index = self._frame_counters.get(idx, 0)
             state = self._state.get(idx, "idle")
-            # pose_data = anim.idle_pose_data if state == "idle" else anim.pose_data
-            # transl = anim.idle_transl if state == "idle" else anim.transl
             pose_data = anim.idle_pose_data if state in ["idle", "idle-only"] else anim.pose_data
             transl = anim.idle_transl if state in ["idle", "idle-only"] else anim.transl
 
@@ -232,9 +178,10 @@ class PedBackgroundBehavior(AtomicBehavior):
                 current_pos = pedestrian.get_transform().location
                 anim.offset = current_pos - first_frame_pos
 
-            self._apply_animation_frame(pose_data, transl, anim, frame_index)
+            animation_return = self._apply_animation_frame(pose_data, transl, anim, frame_index)
             total_frames = pose_data.shape[0]
-            self._frame_counters[idx] = (frame_index + 1) % total_frames
+            if animation_return != 10:
+                self._frame_counters[idx] = (frame_index + 1) % total_frames
 
         return py_trees.common.Status.RUNNING
 
@@ -260,7 +207,7 @@ class PedBackgroundBehavior(AtomicBehavior):
         ) + anim_obj.fixed_spawn_point.location + anim_obj.offset
         collision, _, _ = self.will_next_step_collide_with_any_vehicle(new_location)
         if collision:
-            return
+            return 10
         anim_obj.last_world_loc = new_location
 
         rot = None
@@ -347,7 +294,7 @@ class PedBackgroundBehavior(AtomicBehavior):
                     break
         return near
 
-    def will_next_step_collide_with_any_vehicle(self, next_location, collision_threshold=3):
+    def will_next_step_collide_with_any_vehicle(self, next_location, collision_threshold=1.5):
         """
         Checks if the next animation step will collide with ego or any other vehicle.
         """

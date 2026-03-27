@@ -399,10 +399,11 @@ class RouteScenario(BasicScenario):
         attempting = pd.read_csv(os.path.join(csvs_dir, 'Crossing.csv'))
         crossing = pd.read_csv(os.path.join(csvs_dir, 'Attempting.csv'))
 
-        behavior.add_child(PedBackgroundBehavior(
+        self.ped_behavior = PedBackgroundBehavior(
             self.ego_vehicles[0], self.world, self.route,
             motions_dir, spawn_file, crossing, not_crossing, attempting
-        ))
+        )
+        behavior.add_child(self.ped_behavior)
 
         behavior.add_children(scenario_behaviors)
         return behavior

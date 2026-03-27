@@ -2,7 +2,7 @@
 
 # HABIT: Human Action Benchmark for Interactive Traffic in CARLA
 
-**Accepted at WACV 2026** | [Paper](https://arxiv.org/abs/2511.19109) | [Project Page](https://iv.ee.hm.edu/publications/habit/)
+**Accepted at WACV 2026** | [Paper](https://openaccess.thecvf.com/content/WACV2026/papers/Ramesh_HABIT_Human_Action_Benchmark_for_Interactive_Traffic_in_CARLA_WACV_2026_paper.pdf) | [arXiv](https://arxiv.org/abs/2511.19109) | [Project Page](https://iv.ee.hm.edu/publications/habit/)
 
 *Realistic motion-captured pedestrian behaviors expose critical failures in autonomous driving agents that remain hidden in scripted simulations.*
 
@@ -112,11 +112,13 @@ The evaluator uses the CARLA Leaderboard framework with custom scenario runners 
 ## Citation
 
 ```bibtex
-@inproceedings{ramesh2026habit,
-  title={{HABIT}: Human Action Benchmark for Interactive Traffic in {CARLA}},
-  author={Ramesh, Mohan and Azer, Mark and Flohr, Fabian B.},
-  booktitle={Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)},
-  year={2026}
+@InProceedings{Ramesh_2026_WACV,
+  author    = {Ramesh, Mohan and Azer, Mark and Flohr, Fabian},
+  title     = {{HABIT}: Human Action Benchmark for Interactive Traffic in {CARLA}},
+  booktitle = {Proceedings of the IEEE/CVF Winter Conference on Applications of Computer Vision (WACV)},
+  month     = {March},
+  year      = {2026},
+  pages     = {7148-7157}
 }
 ```
 
@@ -130,4 +132,4 @@ The evaluator uses the CARLA Leaderboard framework with custom scenario runners 
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](https://opensource.org/licenses/MIT) for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

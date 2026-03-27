@@ -1,26 +1,25 @@
 # Reproducibility Notes
 
-## Pedestrian Seeding (Open Issue)
+## Pedestrian Seeding
 
 `PedBackgroundBehavior.initialise()` in `scenario_runner/srunner/scenarios/ped_backgound_activity.py` uses Python's `random` module for:
 
-- `random.sample()` — spawn point selection (line 99)
-- `random.choice()` — walker blueprint, motion file, idle file assignment (lines 100, 105, 106, 145, 150)
-- `random.shuffle()` — ambient idle spawn ordering (line 131)
+- `random.sample()` — spawn point selection
+- `random.choice()` — walker blueprint, motion file, idle file assignment
+- `random.shuffle()` — ambient idle spawn ordering
 
-This is **not seeded**. Each run may assign different motions to different spawn points.
+This is seeded with `random.seed(2000)` at the top of `initialise()`, matching the `CarlaDataProvider._random_seed` convention used elsewhere in the scenario runner.
 
 Animation playback (`update()`) is fully deterministic — once a pedestrian is spawned with a motion file, the frame-by-frame bone animation is identical every time.
 
-### Fix (not yet applied)
+**Note:** Python's `random` and `numpy.random` are independent RNGs. The `CarlaDataProvider` uses `numpy.random.RandomState(2000)` for its own scenarios, while `PedBackgroundBehavior` uses Python's built-in `random` module. Both are now seeded to `2000` but are separate streams.
 
-Add `random.seed(42)` at the top of `initialise()` to make spawn/motion assignment reproducible. Consider making the seed configurable via `config.yaml`.
+## Seeds in the system
 
-### Other seeds in the system
-
-| Component | Seed | Location |
-|-----------|------|----------|
-| CarlaDataProvider RNG | `2000` (hardcoded numpy RandomState) | `srunner/scenariomanager/carla_data_provider.py:67` |
-| Traffic Manager | `0` (CLI `--traffic-manager-seed`) | `leaderboard/leaderboard_evaluator.py:228` |
-| World physics | Synchronous mode + fixed 0.05s timestep | `leaderboard/leaderboard_evaluator.py:177` |
-| Deterministic ragdolls | Enabled | `leaderboard/leaderboard_evaluator.py:180` |
+| Component | Seed | Module | Location |
+|-----------|------|--------|----------|
+| PedBackgroundBehavior | `2000` (Python `random`) | `random.seed(2000)` | `ped_backgound_activity.py:initialise()` |
+| CarlaDataProvider RNG | `2000` (`numpy.random.RandomState`) | `CarlaDataProvider._random_seed` | `carla_data_provider.py:67` |
+| Traffic Manager | `0` (CLI `--traffic-manager-seed`) | `set_random_device_seed()` | `leaderboard_evaluator.py` |
+| World physics | Synchronous mode + fixed 0.05s timestep | `WorldSettings` | `leaderboard_evaluator.py` |
+| Deterministic ragdolls | Enabled | `WorldSettings` | `leaderboard_evaluator.py` |
