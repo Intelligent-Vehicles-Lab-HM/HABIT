@@ -88,7 +88,17 @@ export PYTHONPATH=$(pwd)/carla-0.9.14-py3.7-linux-x86_64.egg:$(pwd):$(pwd)/scena
 
 ## 4. Download Motion Data
 
-Download the motion data (4,730 curated .pkl files derived from HumanML3D/AMASS) from [Google Drive](https://drive.google.com/file/d/1L_BPWBYE-Ho5ieSKZSN-LRNP2OfDdVIi/view?usp=sharing) and extract the `.pkl` files into the `data/motions/` directory:
+Download the motion data (4,730 curated .pkl files derived from HumanML3D/AMASS):
+
+```bash
+# Automatic (requires: pip install gdown)
+bash scripts/download_motion_data.sh
+
+# Or manual: download from Google Drive and extract .pkl files into data/motions/
+# https://drive.google.com/file/d/1L_BPWBYE-Ho5ieSKZSN-LRNP2OfDdVIi/view?usp=sharing
+```
+
+The `.pkl` files should be placed directly in the `data/motions/` directory:
 
 ```
 habit/
