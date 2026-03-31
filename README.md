@@ -10,7 +10,7 @@
 
 </div>
 
-> **Active Development** — The benchmark framework, routes, and behavior labels are available now. Motion data and agent integration guides are being finalized for release. Star & watch this repo for updates.
+> **Available** — The benchmark framework, motion data, routes, and behavior labels are ready for evaluation. Agent integration guides are being finalized. Star & watch this repo for updates.
 
 ## Why HABIT?
 
@@ -44,12 +44,12 @@ State-of-the-art AD agents achieve near-zero collisions on the CARLA Leaderboard
 | Pedestrian spawn points | Available |
 | Agent interface + NPC/dummy reference agents | Available |
 | pMAIS3+ injury severity + FPBR metrics | Available |
-| Motion-capture data (4,730 curated .pkl files) | Coming soon |
+| Motion-capture data (4,730 curated .pkl files) | [Available](https://drive.google.com/file/d/1L_BPWBYE-Ho5ieSKZSN-LRNP2OfDdVIi/view?usp=sharing) |
 | InterFuser / TransFuser / BEVDriver integration guides | Coming soon |
 | Data processing pipeline (motion retargeting tools) | Coming soon |
 | Video-to-motion pipeline | Coming soon |
 
-The benchmark framework is fully available for study and agent development. Motion data release is being prepared — once available, the benchmark runs end-to-end with a single command.
+The benchmark is fully available for evaluation. Download the motion data, start CARLA, and run your agent — see [Getting Started](docs/getting_started.md).
 
 ## Quick Start
 
@@ -80,7 +80,7 @@ export PYTHONPATH=$CARLA_ROOT/PythonAPI/carla:$(pwd):$(pwd)/scenario_runner:$PYT
 bash scripts/run_evaluation.sh leaderboard/autoagents/npc_agent.py
 ```
 
-> **Note:** The full benchmark requires motion data in `data/motions/`. Without it, pedestrian animation will not function. See [Getting Started](docs/getting_started.md) for details.
+> **Note:** The full benchmark requires motion data in `data/motions/`. Download the 4,730 .pkl files from [Google Drive](https://drive.google.com/file/d/1L_BPWBYE-Ho5ieSKZSN-LRNP2OfDdVIi/view?usp=sharing) and extract them there. See [Getting Started](docs/getting_started.md) for details.
 
 ## How It Works
 

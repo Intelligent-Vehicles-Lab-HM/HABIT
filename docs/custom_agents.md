@@ -56,6 +56,7 @@ The track determines which sensors your agent is allowed to use:
 
 **`Track.SENSORS`** -- the standard track. Allowed sensors:
 - `sensor.camera.rgb` -- RGB camera
+- `sensor.camera.semantic_segmentation` -- Semantic segmentation camera
 - `sensor.lidar.ray_cast` -- 3D LIDAR
 - `sensor.other.radar` -- Radar
 - `sensor.other.gnss` -- GPS (latitude, longitude, altitude)
@@ -127,6 +128,18 @@ If your agent requires a configuration file (for model weights, hyperparameters,
 ```bash
 bash scripts/run_evaluation.sh path/to/my_agent.py --agent-config path/to/config.yaml
 ```
+
+## Accessing Pedestrian Behavior Data
+
+The evaluator calls `set_animations(route_scenario)` on your agent after setup. Override this method to access pedestrian ground truth data:
+
+```python
+def set_animations(self, route_scenario):
+    self.ped_behavior = route_scenario.ped_behavior
+    self.ego_vehicle = route_scenario.ego_vehicles[0]
+```
+
+The `ped_behavior` object (`PedBackgroundBehavior`) contains the pedestrian actors, their animation data, and state. This is useful for agents that need ground truth pedestrian positions for evaluation or training.
 
 ## Accessing the Route Plan
 

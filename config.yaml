@@ -19,6 +19,7 @@ evaluation:
   resume: false
 
 pedestrians:
-  count: 100
-  min_distance: 4.0
-  proximity_threshold: 30.0  # meters from ego to activate detailed motion
+  num_idle_real_peds: 20      # animated pedestrians near route
+  num_idle_only_peds: 10      # ambient idle-only pedestrians
+  activation_distance: 15.0   # meters from ego to activate crossing motion
+  collision_threshold: 1.5    # meters from vehicle to freeze pedestrian animation

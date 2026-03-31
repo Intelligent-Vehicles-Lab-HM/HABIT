@@ -88,9 +88,7 @@ export PYTHONPATH=$(pwd)/carla-0.9.14-py3.7-linux-x86_64.egg:$(pwd):$(pwd)/scena
 
 ## 4. Download Motion Data
 
-> **Coming soon** — The motion data release is being finalized. The benchmark includes 4,730 curated .pkl files derived from HumanML3D/AMASS motion-capture data. Star & watch this repository for the release announcement.
-
-Once available, download the motion files and place them in the `data/motions/` directory:
+Download the motion data (4,730 curated .pkl files derived from HumanML3D/AMASS) from [Google Drive](https://drive.google.com/file/d/1L_BPWBYE-Ho5ieSKZSN-LRNP2OfDdVIi/view?usp=sharing) and extract the `.pkl` files into the `data/motions/` directory:
 
 ```
 habit/
