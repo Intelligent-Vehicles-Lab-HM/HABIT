@@ -122,13 +122,20 @@ The evaluator uses the CARLA Leaderboard framework with custom scenario runners 
 }
 ```
 
+## What's New
+
+- **Motion data released** — 4,730 curated .pkl files now [available for download](https://drive.google.com/file/d/1L_BPWBYE-Ho5ieSKZSN-LRNP2OfDdVIi/view?usp=sharing)
+- **Paper-matched parameters** — activation distance, collision threshold, and pedestrian counts aligned with WACV 2026 evaluation
+- **Reproducible seeding** — deterministic pedestrian spawning via `random.seed(2000)`
+- **Semantic segmentation sensor** — agents can now use `sensor.camera.semantic_segmentation`
+- **`set_animations()` API** — agents can access pedestrian ground truth for evaluation
+
 ## Roadmap
 
-1. **Motion data release** — 4,730 curated .pkl files for full benchmark reproduction
-2. **Agent integration guides** — step-by-step setup for InterFuser, TransFuser, BEVDriver
-3. **Data processing pipeline** — tools for converting HumanML3D/AMASS motions to CARLA-ready format
+1. **Agent integration guides** — step-by-step setup for InterFuser, TransFuser, BEVDriver
+2. **Data processing pipeline** — tools for converting HumanML3D/AMASS motions to CARLA-ready format
+3. **Benchmark generation tools** — scripts for generating new routes, spawn points, behavior CSVs
 4. **Video-to-motion pipeline** — generate pedestrian motions from video footage
-5. **Benchmark generation tools** — scripts for generating new routes, spawn points, behavior CSVs
 
 ## License
 
