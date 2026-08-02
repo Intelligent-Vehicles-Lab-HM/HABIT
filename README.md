@@ -45,9 +45,8 @@ State-of-the-art AD agents achieve near-zero collisions on the CARLA Leaderboard
 | Agent interface + NPC/dummy reference agents | Available |
 | pMAIS3+ injury severity + FPBR metrics | Available |
 | Motion-capture data (4,730 curated .pkl files) | [Available](https://drive.google.com/file/d/1L_BPWBYE-Ho5ieSKZSN-LRNP2OfDdVIi/view?usp=sharing) |
-| InterFuser / TransFuser / BEVDriver integration guides | Coming soon |
-| Data processing pipeline (motion retargeting tools) | Coming soon |
-| Video-to-motion pipeline | Coming soon |
+| Motion retargeting tools (SMPL to CARLA) | [Available](tools/motion/) |
+| InterFuser / TransFuser / BEVDriver integration guides | [Available](docs/agent_environments.md) |
 
 The benchmark is fully available for evaluation. Download the motion data, start CARLA, and run your agent — see [Getting Started](docs/getting_started.md).
 
@@ -130,12 +129,22 @@ The evaluator uses the CARLA Leaderboard framework with custom scenario runners 
 - **Semantic segmentation sensor** — agents can now use `sensor.camera.semantic_segmentation`
 - **`set_animations()` API** — agents can access pedestrian ground truth for evaluation
 
-## Roadmap
+## Extending HABIT
 
-1. **Agent integration guides** — step-by-step setup for InterFuser, TransFuser, BEVDriver
-2. **Data processing pipeline** — tools for converting HumanML3D/AMASS motions to CARLA-ready format
-3. **Benchmark generation tools** — scripts for generating new routes, spawn points, behavior CSVs
-4. **Video-to-motion pipeline** — generate pedestrian motions from video footage
+**Adding your own pedestrian motions.** The benchmark ships with 4,730 motions already converted,
+but you can add more from any SMPL source — AMASS, HumanML3D, or video lifted with a pose
+estimator. See [tools/motion](tools/motion/) for the converter and a notebook walking through the
+retargeting maths.
+
+**Evaluating your own agent.** Implement the `AutonomousAgent` interface described in
+[custom_agents.md](docs/custom_agents.md). Agents written for the CARLA leaderboard run without
+modification.
+
+**Custom routes and scenarios.** Routes are plain XML in `data/routes/` and pedestrian spawn
+points are pickled `carla.Transform` lists in `data/spawn_points/`, both editable directly. For
+generating new route sets from scratch, the
+[CARLA leaderboard](https://github.com/carla-simulator/leaderboard) tooling applies unchanged.
+Note that results are only comparable across runs that use the same route set.
 
 ## License
 

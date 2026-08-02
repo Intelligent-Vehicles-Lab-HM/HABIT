@@ -10,6 +10,10 @@ results/
 # Test artifacts
 test_run/
 
+# Notebooks
+.ipynb_checkpoints/
+tools/motion/example_motion.pkl
+
 # Python
 __pycache__/
 *.pyc

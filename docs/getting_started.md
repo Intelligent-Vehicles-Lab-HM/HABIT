@@ -172,9 +172,11 @@ The paper evaluates three state-of-the-art AD agents:
 | [TransFuser](https://github.com/autonomousvision/transfuser) | autonomousvision/transfuser | PyTorch 1.12 |
 | [BEVDriver](https://github.com/AlanLiangC/BEVDriver) | AlanLiangC/BEVDriver | PyTorch 2.0 |
 
-Each agent requires its own conda environment due to conflicting PyTorch versions. See [agent_environments.md](agent_environments.md) for detailed setup instructions.
+Each agent requires its own conda environment due to conflicting PyTorch versions. See [agent_environments.md](agent_environments.md) for setup instructions.
 
-> **Coming soon** — Full integration guides for all three agents are being prepared. The agent interface is documented in [custom_agents.md](custom_agents.md).
+All three subclass the CARLA leaderboard's `AutonomousAgent`, which HABIT preserves, so they run
+here without being rewritten — install each from its own repository and point the evaluator at it.
+The interface is documented in [custom_agents.md](custom_agents.md).
 
 ## 7. Understanding Results
 
