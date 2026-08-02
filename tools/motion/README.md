@@ -22,6 +22,29 @@ you build it yourself.
 Whichever you use, you need the pose in axis-angle form. Anything from 66 values per frame
 upward works — extra SMPL-H/X joints are ignored.
 
+### Before you convert: check the trajectory
+
+Retargeting is one stage of the pipeline in the paper. It maps joint rotations onto CARLA's
+skeleton (Sec. 3.3) and is what these tools do. It takes the root orientation and translation as
+given, and will reproduce a poor trajectory as faithfully as a good one.
+
+The released motions had a **trajectory reconstruction** step applied first (Sec. 3.2): the root
+orientation is converted to a valid rotation at every frame and the global path is rebuilt by
+integrating velocity along the pedestrian's own forward direction, rather than accumulating
+frame-wise deltas. It exists to remove abrupt heading changes, foot sliding and inconsistent
+velocities.
+
+Whether you need it depends on where the root came from:
+
+- **Measured** — AMASS carries a ground-truth mocap root, and most video lifting pipelines
+  produce a world-frame root. Convert directly.
+- **Estimated** — SMPL fitted to joint positions, which is the case for HumanML3D, has a root
+  inferred by the fit rather than observed. This is where the artifacts above appear, and the
+  reason the released motions were refined before conversion.
+
+If a converted pedestrian slides, drifts or snaps its heading in CARLA, the trajectory is the
+first thing to check, not the retargeting. See Sec. 3.2 of the paper for the formulation.
+
 ## Converting
 
 ```bash
