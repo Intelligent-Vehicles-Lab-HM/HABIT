@@ -11,12 +11,14 @@ This release adds the motion retargeting tools and completes the agent integrati
 - Implements Sec. 3.3 of the paper; depends only on NumPy, PyYAML and joblib
 - Reads the common `.npz` layouts (AMASS included), retimes clips to the benchmark's 20 Hz, and skips unreadable files rather than aborting a batch
 - `--rotation` selects the joint rotation map: `euler` (default) reproduces the released motions, `expmap` applies Eq. 3 literally
+- Warns when a source clip declares no frame rate. The runtime advances one frame every 0.05 s, so an unretimed 120 Hz clip would otherwise play six times too slowly with nothing downstream able to detect it
 - Added `tools/motion/dump_carla_rest_pose.py` for regenerating the rig data for other CARLA versions or walker blueprints
 
 ### Documentation
 
 - Added `tools/motion/retargeting_walkthrough.ipynb` — the conversion one equation at a time, with a 3D preview of the result
 - Added `tools/motion/README.md`, covering where to obtain SMPL data. HumanML3D cannot be redistributed, so it points at the upstream repository
+- Documented the trajectory reconstruction stage (Sec. 3.2), which the released motions went through before retargeting. Sources with a measured root (AMASS, most video lifting pipelines) convert directly; a root estimated by fitting SMPL to joint positions, as HumanML3D requires, is where heading changes and foot sliding originate
 - Rewrote `docs/agent_environments.md` — third-party agents subclass the CARLA leaderboard's `AutonomousAgent`, which HABIT preserves, so InterFuser, TransFuser and BEVDriver run unmodified. The guides cover the environments and setup each needs instead of shipping copies
 - Replaced the roadmap with an "Extending HABIT" section
 
