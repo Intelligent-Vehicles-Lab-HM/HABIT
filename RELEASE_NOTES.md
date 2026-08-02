@@ -1,5 +1,35 @@
 # Release Notes
 
+## v1.2.0 — Motion Tools (2026-08-02)
+
+This release adds the motion retargeting tools and completes the agent integration guides. Nothing on the roadmap is now outstanding.
+
+### Motion Retargeting Tools
+
+- Added `tools/motion/smpl_to_carla.py` — converts SMPL motion sequences into the runtime `.pkl` format
+- Works with any SMPL source: AMASS, HumanML3D, or video lifted with a pose estimator
+- Implements Sec. 3.3 of the paper; depends only on NumPy, PyYAML and joblib
+- Reads the common `.npz` layouts (AMASS included), retimes clips to the benchmark's 20 Hz, and skips unreadable files rather than aborting a batch
+- `--rotation` selects the joint rotation map: `euler` (default) reproduces the released motions, `expmap` applies Eq. 3 literally
+- Added `tools/motion/dump_carla_rest_pose.py` for regenerating the rig data for other CARLA versions or walker blueprints
+
+### Documentation
+
+- Added `tools/motion/retargeting_walkthrough.ipynb` — the conversion one equation at a time, with a 3D preview of the result
+- Added `tools/motion/README.md`, covering where to obtain SMPL data. HumanML3D cannot be redistributed, so it points at the upstream repository
+- Rewrote `docs/agent_environments.md` — third-party agents subclass the CARLA leaderboard's `AutonomousAgent`, which HABIT preserves, so InterFuser, TransFuser and BEVDriver run unmodified. The guides cover the environments and setup each needs instead of shipping copies
+- Replaced the roadmap with an "Extending HABIT" section
+
+### Validation
+
+- The five bones with no SMPL counterpart reproduce the rig's rest rotation exactly, matching the released motions
+- Converting a known sequence reproduces the pipeline that generated the released set to within float32 rounding
+- The released motions were generated against the `male` CARLA rest pose, which is the converter's default
+
+### Removed from Roadmap
+
+- Benchmark generation tools. The generated data ships and is editable in place, and CARLA's own leaderboard tooling covers building new route sets. Results are only comparable across runs sharing a route set, so a fixed benchmark is the intent
+
 ## v1.1.0 — Paper-Aligned Release (2026-03-31)
 
 This release aligns the benchmark with the exact parameters used in the WACV 2026 paper evaluation and makes the motion data publicly available.
