@@ -40,6 +40,13 @@ Clips are retimed to 20 Hz to match the benchmark's animation rate. Retiming pic
 frames rather than blending rotations. Files that cannot be read are reported and skipped, so one
 bad file will not stop a batch.
 
+**Frame rate matters.** The runtime advances one animation frame every 0.05 s, so a clip that is
+not at 20 Hz plays at the wrong speed — raw AMASS at 120 Hz would walk six times too slowly, over
+six times the duration. Retiming handles this whenever the source rate is known. If a file
+declares no rate the converter assumes it is already at the target and prints a warning; if that
+assumption is wrong, put the rate in the file. Data processed through HumanML3D is already at
+20 Hz, so the retiming is a no-op there.
+
 | Option | Default | |
 |---|---|---|
 | `--rig` | `male` | CARLA rest pose to target. The released motions use `male`. |

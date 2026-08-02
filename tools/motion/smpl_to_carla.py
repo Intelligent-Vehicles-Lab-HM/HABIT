@@ -299,6 +299,16 @@ def convert(path, rig='male', rotation='euler', target_fps=20.0, data_dir=DATA_D
     """Convert one SMPL file into the runtime motion dict."""
     omega, trans, source_fps = read_smpl(path)
 
+    if source_fps is None:
+        # The runtime consumes one frame every 0.05 s, so a clip that is not at
+        # the target rate plays at the wrong speed: feed it 120 Hz mocap and the
+        # pedestrian walks six times too slowly. Nothing downstream can detect
+        # that, so say something here.
+        print('{}: no frame rate found (looked for {}); assuming it is already '
+              'at {:g} Hz. Pass the rate in the file if it is not.'
+              .format(os.path.basename(path), ', '.join(FPS_KEYS), target_fps),
+              file=sys.stderr)
+
     keep = resample_indices(len(omega), source_fps, target_fps)
     omega, trans = omega[keep], trans[keep]
 
